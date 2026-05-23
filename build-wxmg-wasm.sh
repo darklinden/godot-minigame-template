@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build Godot WASM engine for WeChat Mini Game
 #
-# Clones Godot 4.4.1 (shallow) on first run, applies Mini Game patches,
+# Clones Godot 4.5.1 (shallow) on first run, applies Mini Game patches,
 # and compiles with optional PCK encryption.
 #
 # Usage:
@@ -27,9 +27,9 @@ set -euo pipefail
 PROFILE="${1:-2d-tiny}"
 CLEAN="${2:---clean}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-GODOT_DIR="$SCRIPT_DIR/godot"
+GODOT_DIR="$SCRIPT_DIR/.godot_src"
 GODOT_REPO="https://github.com/darklinden/godot.git"
-GODOT_BRANCH="4.4"
+GODOT_BRANCH="4.5.1-stable"
 
 # ---------------------------------------------------------------------------
 # Profile settings
@@ -120,7 +120,8 @@ module_jolt_physics_enabled = "$MODULE_JOLT"
 module_mobile_vr_enabled = "no"
 module_openxr_enabled = "no"
 module_webxr_enabled = "no"
-module_text_server_adv_enabled = "no"
+disable_advanced_gui = "no"
+module_text_server_adv_enabled = "yes"
 module_text_server_fb_enabled = "yes"
 module_webrtc_enabled = "no"
 PYEOF
@@ -166,11 +167,12 @@ echo ""
 echo "==> Build complete. Extracting outputs..."
 
 # --- godot.wasm + brotli ---
-unzip -o "$WASM_ZIP" godot.wasm -d /tmp/wxmg_wasm/
+rm -rf /tmp/wxmg_wasm/
+mkdir -p /tmp/wxmg_wasm
+unzip "$WASM_ZIP" -d /tmp/wxmg_wasm
 ENGINE_DIR="$SCRIPT_DIR/engine"
 mkdir -p "$ENGINE_DIR"
 
-cp /tmp/wxmg_wasm/godot.wasm "$ENGINE_DIR/godot.wasm"
 if command -v brotli &>/dev/null; then
     brotli -f --best "$ENGINE_DIR/godot.wasm" -o "$ENGINE_DIR/godot.wasm.br"
     echo "  -> engine/godot.wasm.br ($(du -h "$ENGINE_DIR/godot.wasm.br" | cut -f1))"
@@ -178,6 +180,10 @@ else
     echo "  -> engine/godot.wasm ($(du -h "$ENGINE_DIR/godot.wasm" | cut -f1))"
     echo "  ⚠️  brotli not found — no .br file. Install: brew install brotli"
 fi
+
+cp /tmp/wxmg_wasm/godot.audio.worklet.js "$ENGINE_DIR/"
+cp /tmp/wxmg_wasm/godot.audio.position.worklet.js "$ENGINE_DIR/"
+cp /tmp/wxmg_wasm/godot.service.worker.js "$ENGINE_DIR/"
 
 rm -rf /tmp/wxmg_wasm/
 

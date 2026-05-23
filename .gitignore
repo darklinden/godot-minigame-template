@@ -1,5 +1,3 @@
-engine/godot.wasm.br
-engine/godot.zip
-
-/godot
-/engine/godot.wasm.br
+/.godot_src
+/engine
+.claude
