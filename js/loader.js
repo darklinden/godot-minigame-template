@@ -331,6 +331,9 @@ class Loader {
           args: ["--audio-driver", "ScriptProcessor"],
         });
       })
+      .catch((err) => {
+        console.error("[loader] Engine startGame failed:", err);
+      })
       .then(() => {
         engine.config.persistentPaths.forEach(path => {
           godotSdk.copyLocalToFS(path);

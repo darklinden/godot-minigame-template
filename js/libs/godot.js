@@ -12588,14 +12588,40 @@ const Preloader = /** @constructor */ function () {
             done: false,
         };
         return new Promise((resolve, reject) => {
-            const fs = wx.getFileSystemManager();
-            fs.readFile({
-                filePath: file,
-                success: (res) => resolve(res.data),
-                fail: (reason) => {
-                    reject(reason.errMsg);
-                },
-            });
+            // Try XHR first (compatible with WeChat worker context where
+            // wx.getFileSystemManager().readFile may not be supported).
+            var tryReadFile = function() {
+                try {
+                    const fs = wx.getFileSystemManager();
+                    fs.readFile({
+                        filePath: file,
+                        success: (res) => resolve(res.data),
+                        fail: (reason) => {
+                            reject(reason.errMsg);
+                        },
+                    });
+                } catch (e) {
+                    reject(e.message || e);
+                }
+            };
+            try {
+                const xhr = new XMLHttpRequest();
+                xhr.open("GET", file, true);
+                xhr.responseType = "arraybuffer";
+                xhr.onload = function() {
+                    if (xhr.status === 200 || xhr.status === 0) {
+                        resolve(xhr.response);
+                    } else {
+                        tryReadFile();
+                    }
+                };
+                xhr.onerror = function() {
+                    tryReadFile();
+                };
+                xhr.send(null);
+            } catch (e) {
+                tryReadFile();
+            }
         });
     }
 
