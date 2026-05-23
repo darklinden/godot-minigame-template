@@ -1,4 +1,6 @@
 import "./libs/godot";
+import "./libs/godot-eval-bridge";
+import "./libs/wx-api-bridge";
 import { GodotSDK } from "./libs/sdk"
 
 const LoaderConfig = {

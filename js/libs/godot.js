@@ -9432,12 +9432,7 @@ var Godot = (() => {
             const js_code = GodotRuntime.parseString(p_js);
             let eval_ret = null;
             try {
-                if (p_use_global_ctx) {
-                    const global_eval = eval;
-                    eval_ret = global_eval(js_code);
-                } else {
-                    eval_ret = eval(js_code);
-                }
+                eval_ret = __godotEval(js_code);
             } catch (e) {
                 GodotRuntime.error(e);
             }

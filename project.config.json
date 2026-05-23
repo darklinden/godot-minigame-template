@@ -15,8 +15,8 @@
     "enhance": true
   },
   "compileType": "game",
-  "libVersion": "3.7.0",
-  "appid": "wx85fbcedfa360a1ce",
+  "libVersion": "3.7.12",
+  "appid": "wx67e46f972741884e",
   "projectname": "quickstart",
   "condition": {},
   "packOptions": {
