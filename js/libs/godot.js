@@ -4271,6 +4271,9 @@ var Godot = (() => {
         }
         var timers = {};
         var handleException = (e) => {
+            if (e instanceof ExitStatus || e == "unwind") {
+                return EXITSTATUS;
+            }
             console.error(
                 "[godot] handleException:",
                 e,
@@ -4281,9 +4284,6 @@ var Godot = (() => {
                 "stack:",
                 e?.stack
             );
-            if (e instanceof ExitStatus || e == "unwind") {
-                return EXITSTATUS;
-            }
             checkStackCookie();
             if (
                 typeof WebAssembly !== "undefined" &&
